@@ -24,45 +24,61 @@ class GildedRose {
 
     public void updateQuality() {
         for (Item item : items) {
-            // Guard Clause: Sulfuras does not change in quality or sellIn
-            if (item.name.equals(SULFURAS)) {
-                continue;
-            }
+            updateItemQuality(item);
+        }
+    }
 
-            // Decrement sellIn for all items except Sulfuras
-            item.sellIn--;
+    private void updateItemQuality(Item item) {
+        // Guard Clause: Sulfuras does not change in quality or sellIn
+        if (item.name.equals(SULFURAS)) {
+            return;
+        }
 
-            // Handle Aged Brie
-            if (item.name.equals(AGED_BRIE)) {
-                increaseQuality(item);
-                if (item.sellIn < 0) {
-                    increaseQuality(item);
-                }
+        item.sellIn--;
 
-                continue;
-            }
+        switch (item.name) {
+            case AGED_BRIE:
+                updateAgedBrie(item);
+                break;
 
-            // Handle Backstage Passes
-            if (item.name.equals(BACKSTAGE_PASSES)) {
-                if (item.sellIn < 0) {
-                    item.quality = 0;
-                    continue;
-                }
-                increaseQuality(item);
-                if (item.sellIn < 10) {
-                    increaseQuality(item);
-                }
-                if (item.sellIn < 5) {
-                    increaseQuality(item);
-                }
-                continue;
-            }
+            case BACKSTAGE_PASSES:
+                updateBackstage(item);
+                break;
 
-            // Handle Normal Items
+            default:
+                updateNormalItem(item);
+                break;
+        }
+    }
+
+    private void updateNormalItem(Item item) {
+        // Handle Normal Items
+        decreaseQuality(item);
+        if (item.sellIn < 0) {
             decreaseQuality(item);
-            if (item.sellIn < 0) {
-                decreaseQuality(item);
+        }
+    }
+
+    private void updateBackstage(Item item) {
+        // Handle Backstage Passes
+        if (item.sellIn < 0) {
+            item.quality = 0;
+        } else {
+            increaseQuality(item);
+            if (item.sellIn < 10) {
+                increaseQuality(item);
             }
+            if (item.sellIn < 5) {
+                increaseQuality(item);
+            }
+        }
+    }
+
+    private void updateAgedBrie(Item item) {
+        // Handle Aged Brie
+        increaseQuality(item);
+        if (item.sellIn < 0) {
+            increaseQuality(item);
         }
     }
 }
